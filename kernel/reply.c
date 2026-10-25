@@ -19,7 +19,7 @@ static const struct {
     { "grep",     0     },
     { "stat",     80    },
     { "write",    30    },
-    { "pipe",     0     },
+    { "pipe",     500   },
     { NULL,       0     }
 };
 
@@ -71,9 +71,7 @@ void reply_send(const struct request *req, const struct resp *resp) {
     if (resp->ok) {
         n += str_ncopy("\"ok\":true,\"data\":", buf + n, MAX_LINE_LEN - n);
         if (resp->data_json) {
-            while (*resp->data_json && n < MAX_LINE_LEN - 1) {
-                { const char *d = resp->data_json; while (*d && n < MAX_LINE_LEN - 1) { buf[n++] = *d++; } }
-            }
+            n += str_ncopy(resp->data_json, buf + n, MAX_LINE_LEN - n);
         } else {
             buf[n++] = '{';
             buf[n++] = '}';
@@ -119,6 +117,7 @@ void reply_error(int id, const char *code, const char *meaning,
                  const char *sug_op, const char *sug_args) {
     struct request req;
     req.id = id;
+    req.op[0] = '\0';
     struct resp resp;
     resp.ok = false;
     resp.err_code = code;

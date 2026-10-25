@@ -109,3 +109,13 @@ int path_resolve(const char *path, const struct inode **out) {
     *out = cur;
     return 0;
 }
+
+uint32_t ramfs_used_bytes(void) {
+    uint32_t total = MAX_INODES * sizeof(struct inode);
+    for (uint32_t i = 0; i < inode_count; i++) {
+        if (inodes[i].type == N_FILE) {
+            total += inodes[i].bytes;
+        }
+    }
+    return total;
+}

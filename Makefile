@@ -6,7 +6,7 @@ QEMU    = qemu-system-i386
 PYTHON  = python3
 OBJCOPY = objcopy
 
-CFLAGS  = -m32 -ffreestanding -fno-pic -fno-stack-protector -fno-builtin -nostdlib -Wall -Wextra -O2 -Iinclude
+CFLAGS  = -mno-sse -mno-mmx  -m32 -ffreestanding -fno-pic -fno-stack-protector -fno-builtin -nostdlib -Wall -Wextra -O2 -Iinclude
 LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
 
 KERNEL_SRCS = kernel/main.c kernel/serial.c kernel/gdt.c kernel/json.c kernel/registry.c kernel/ramfs.c kernel/ops.c kernel/reply.c kernel/alloc.c kernel/ramfs_data.c

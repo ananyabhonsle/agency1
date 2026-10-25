@@ -51,7 +51,7 @@ int serial_readline(char *buf, unsigned cap, unsigned timeout_ms) {
     uint32_t start = uptime_ms();
 
     while (len < cap - 1) {
-        if (uptime_ms() - start >= timeout_ms) {
+        if (timeout_ms > 0 && len > 0 && uptime_ms() - start >= timeout_ms) {
             return 0;
         }
         if (inb(UART_LSR) & LSR_DATA_READY) {
@@ -63,6 +63,7 @@ int serial_readline(char *buf, unsigned cap, unsigned timeout_ms) {
             if (c != '\r') {
                 buf[len++] = c;
             }
+            start = uptime_ms();
         }
     }
     buf[cap - 1] = '\0';

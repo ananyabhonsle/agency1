@@ -26,3 +26,7 @@ void *arena_alloc(unsigned size) {
     arena_ptr += size;
     return p;
 }
+
+uint32_t arena_used_bytes(void) {
+    return (uint32_t)(arena_ptr - (char *)ARENA_BASE);
+}

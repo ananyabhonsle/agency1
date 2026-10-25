@@ -63,11 +63,11 @@ static void my_memzero(unsigned char *dst, unsigned n) {
 void ramfs_load(void) {
     /* Build inode table at start of RAMFS_PTR */
     struct inode *ino_table = (struct inode *)RAMFS_PTR;
-    unsigned char *content_area = RAMFS_PTR + 64 * 48;  /* after inode table */
+    unsigned char *content_area = RAMFS_PTR + MAX_INODES * sizeof(struct inode);
     unsigned content_offset = 0;
 
     /* Zero the inode table */
-    my_memzero((unsigned char *)ino_table, 64 * 48);
+    my_memzero((unsigned char *)ino_table, MAX_INODES * sizeof(struct inode));
 
     /* Build inodes */
     unsigned num_specs = sizeof(RAMFS_SPEC) / sizeof(RAMFS_SPEC[0]);
@@ -80,10 +80,11 @@ void ramfs_load(void) {
 
         /* Copy name */
         unsigned name_len = my_strlen(s->name);
-        for (unsigned j = 0; j < 31 && j < name_len; j++) {
+        unsigned j = 0;
+        for (; j < 31 && j < name_len; j++) {
             ino->name[j] = s->name[j];
         }
-        ino->name[31] = 0;
+        ino->name[j] = '\0';
 
         ino->parent_id = s->parent;
 
@@ -106,5 +107,10 @@ void ramfs_load(void) {
             ino->offset = 0;
             ino->bytes = 0;
         }
+    }
+
+    for (unsigned i = num_specs; i < MAX_INODES; i++) {
+        ino_table[i].id = 0xFFFFFFFF;
+        ino_table[i].name[0] = '\0';
     }
 }

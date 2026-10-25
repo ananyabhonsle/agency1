@@ -39,6 +39,7 @@ extern volatile uint32_t uptime_ticks;
 /* ----- Bump allocator (kernel/alloc.c) ----- */
 void  arena_init(void);
 void *arena_alloc(unsigned size);
+uint32_t arena_used_bytes(void);
 
 /* ----- JSON parser (kernel/json.c) ----- */
 enum jval_type { J_NULL, J_BOOL, J_INT, J_STR, J_ARR, J_OBJ };
@@ -117,6 +118,7 @@ void ramfs_init(void);
 const struct inode *ramfs_lookup_child(const struct inode *parent, const char *name);
 int ramfs_resolve(const char *path, const struct inode **out);
 int path_resolve(const char *path, const struct inode **out);
+uint32_t ramfs_used_bytes(void);
 
 /* ----- Ops (kernel/ops.c) ----- */
 int op_ping(const struct jval *args, struct resp *out);

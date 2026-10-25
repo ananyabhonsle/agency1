@@ -79,10 +79,22 @@ static void idt_set_entry(int i, uint32_t base, uint16_t sel, uint8_t flags) {
     idt[i].base_high = (base >> 16) & 0xFFFF;
 }
 
+__attribute__((naked)) static void timer_isr(void) {
+    __asm__ __volatile__(
+        "pushal\n"
+        "incl uptime_ticks\n"
+        "movb $0x20, %al\n"
+        "outb %al, $0x20\n"
+        "popal\n"
+        "iretl\n"
+    );
+}
+
 void idt_init(void) {
     for (int i = 0; i < 256; i++) {
         idt_set_entry(i, 0, 0x08, 0);
     }
+    idt_set_entry(0x20, (uint32_t)timer_isr, 0x08, 0x8E);
     idtp.limit = sizeof(idt) - 1;
     idtp.base  = (uint32_t)&idt;
     __asm__ __volatile__("lidt %0" : : "m"(idtp));
@@ -128,6 +140,8 @@ void pit_init(void) {
         do { __asm__ __volatile__("inb %1, %0" : "=a"(lsr) : "Nd"(0x3FD)); } while ((lsr & 0x20) == 0);
         __asm__ __volatile__("outb %0, %1" : : "a"((uint8_t)'d'), "Nd"(0x3F8));
     }
+    outb(0x21, 0xFE); /* unmask IRQ0 */
+    __asm__ __volatile__("sti");
 }
 
 uint32_t uptime_ms(void) {

@@ -51,6 +51,7 @@ static const char *parse_object(const char *p, struct jval *out) {
                     if (depth == 0) break;
                     depth--;
                 }
+                else if (*q == ',' && depth == 0) break;
                 q++;
             }
             if (*q == ',') q++;
